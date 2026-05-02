@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand -->
+    <color name="accent_color">#E53935</color>
+    <color name="accent_dark">#B71C1C</color>
+
+    <!-- Backgrounds -->
+    <color name="bg_dark">#121212</color>
+    <color name="bg_surface">#1E1E1E</color>
+    <color name="bg_card">#2C2C2C</color>
+
+    <!-- Text -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B3FFFFFF</color>
+
+    <!-- UI -->
+    <color name="divider_color">#33FFFFFF</color>
+    <color name="error_color">#FF5252</color>
+    <color name="live_badge">#E53935</color>
+
+    <!-- TV specific -->
+    <color name="tv_brand_color">#E53935</color>
+    <color name="tv_search_color">#FFFFFF</color>
+    <color name="tv_selected_bg">#33E53935</color>
+</resources>
