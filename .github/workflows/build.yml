@@ -1,17 +1,19 @@
-name: Build Android APK
+name: Build and Release APK
 
 on:
   push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+    tags:
+      - 'v*' # যখন আপনি v1.0, v1.1 এভাবে ট্যাগ পুশ করবেন তখন রান হবে
+  workflow_dispatch: # ম্যানুয়ালি রান করার অপশন
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # রিলিজ ক্রিয়েট করার জন্য পারমিশন জরুরি
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
@@ -21,34 +23,24 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Grant Gradlew Permission
+      - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Cache Gradle
-        uses: actions/cache@v4
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
+
+      - name: Get Version Name
+        id: get_version
+        run: echo "VERSION_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug --stacktrace
-
-      - name: Upload Debug APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: LiveTV-Debug-APK
-          path: app/build/outputs/apk/debug/app-debug.apk
-          retention-days: 7
-
-      # Uncomment below for Release build (requires signing keystore)
-      # - name: Build Release APK
-      #   run: ./gradlew assembleRelease
-      #   env:
-      #     KEYSTORE_PATH: ${{ secrets.KEYSTORE_PATH }}
-      #     KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-      #     KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-      #     STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: |
+            app/build/outputs/apk/release/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
