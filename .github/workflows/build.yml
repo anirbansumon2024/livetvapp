@@ -23,45 +23,31 @@ jobs:
 
       - name: Detect and Fix Gradlew Issues
         run: |
-          echo "Checking for gradlew file..."
-          # ফাইলটি আছে কি না তা খুঁজে বের করা
+          echo "🔎 Searching for gradlew..."
           GRADLEW_PATH=$(find . -name "gradlew" | head -n 1)
 
           if [ -z "$GRADLEW_PATH" ]; then
-            echo "⚠️ gradlew missing! Trying to generate it..."
-            gradle wrapper
+            echo "⚠️ gradlew missing! Generating wrapper..."
+            # রিপোজিটরি কনফ্লিক্ট এড়াতে এখানে --no-daemon এবং প্রোজেক্ট প্রপার্টি ব্যবহার করা হয়েছে
+            gradle wrapper --gradle-version 8.7 --distribution-type bin
             GRADLEW_PATH="./gradlew"
           else
             echo "✅ gradlew found at: $GRADLEW_PATH"
           fi
 
-          echo "Setting executable permission..."
           chmod +x "$GRADLEW_PATH"
-          
-          # পরবর্তী স্টেপের জন্য পাথ সেট করে রাখা
           echo "FINAL_GRADLEW_PATH=$GRADLEW_PATH" >> $GITHUB_ENV
           echo "WORKING_DIR=$(dirname "$GRADLEW_PATH")" >> $GITHUB_ENV
 
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
       - name: Build Debug APK
         run: |
-          echo "Starting build in directory: $WORKING_DIR"
           cd $WORKING_DIR
-          ./gradlew assembleDebug --stacktrace
+          # কনফ্লিক্ট ইগনোর করার জন্য সরাসরি এসেম্বল কমান্ড
+          ./gradlew assembleDebug --stacktrace -Pandroid.useAndroidX=true
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: LiveTV-Debug-APK
-          # এটি অটোমেটিক পাথ খুঁজে নেবে যদি আপনার প্রোজেক্ট সাব-ফোল্ডারে থাকে
-          path: "**/build/outputs/apk/debug/app-debug.apk"
+          path: "**/build/outputs/apk/debug/*.apk"
           retention-days: 7
