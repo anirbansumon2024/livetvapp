@@ -21,8 +21,26 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Grant Gradlew Permission
-        run: chmod +x gradlew
+      - name: Detect and Fix Gradlew Issues
+        run: |
+          echo "Checking for gradlew file..."
+          # ফাইলটি আছে কি না তা খুঁজে বের করা
+          GRADLEW_PATH=$(find . -name "gradlew" | head -n 1)
+
+          if [ -z "$GRADLEW_PATH" ]; then
+            echo "⚠️ gradlew missing! Trying to generate it..."
+            gradle wrapper
+            GRADLEW_PATH="./gradlew"
+          else
+            echo "✅ gradlew found at: $GRADLEW_PATH"
+          fi
+
+          echo "Setting executable permission..."
+          chmod +x "$GRADLEW_PATH"
+          
+          # পরবর্তী স্টেপের জন্য পাথ সেট করে রাখা
+          echo "FINAL_GRADLEW_PATH=$GRADLEW_PATH" >> $GITHUB_ENV
+          echo "WORKING_DIR=$(dirname "$GRADLEW_PATH")" >> $GITHUB_ENV
 
       - name: Cache Gradle
         uses: actions/cache@v4
@@ -35,20 +53,15 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --stacktrace
+        run: |
+          echo "Starting build in directory: $WORKING_DIR"
+          cd $WORKING_DIR
+          ./gradlew assembleDebug --stacktrace
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: LiveTV-Debug-APK
-          path: app/build/outputs/apk/debug/app-debug.apk
+          # এটি অটোমেটিক পাথ খুঁজে নেবে যদি আপনার প্রোজেক্ট সাব-ফোল্ডারে থাকে
+          path: "**/build/outputs/apk/debug/app-debug.apk"
           retention-days: 7
-
-      # Uncomment for signed Release build (add secrets to GitHub repo settings first)
-      # - name: Build Release APK
-      #   run: ./gradlew assembleRelease
-      #   env:
-      #     KEYSTORE_PATH: ${{ secrets.KEYSTORE_PATH }}
-      #     KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-      #     KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-      #     STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
