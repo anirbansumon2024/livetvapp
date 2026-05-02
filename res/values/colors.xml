@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    
+    <!-- Mobile Colors -->
+    <color name="bg_dark">#121212</color>
+    <color name="bg_surface">#1E1E1E</color>
+    <color name="mobile_card_bg">#252525</color>
+    <color name="mobile_text_primary">#FFFFFF</color>
+    <color name="mobile_text_secondary">#B0B0B0</color>
+    <color name="accent_color">#FFD700</color>
+    <color name="error_color">#CF6679</color>
+    <color name="divider_color">#333333</color>
+    
+    <!-- TV Colors -->
+    <color name="tv_bg">#0A0A0A</color>
+    <color name="category_chip_selected">#FFD700</color>
+    <color name="category_chip_unselected">#333333</color>
+</resources>
