@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- রুট আইডিটি মোবাইলের সাথে ম্যাচ করানো হয়েছে -->
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/tv_fragment_container"
+    android:id="@+id/main_root_layout" 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/tv_bg" />
+    android:background="@color/tv_bg">
+
+    <!-- ফ্র্যাগমেন্ট কন্টেইনারটি ভেতরে রাখা হলো যাতে রুট এলিমেন্ট ম্যাচ করে -->
+    <FrameLayout
+        android:id="@+id/tv_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</FrameLayout>
