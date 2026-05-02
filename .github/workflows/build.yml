@@ -1,4 +1,4 @@
-name: Build and Release APK (Auto-Generate Wrapper)
+name: Build and Release APK
 
 on:
   push:
@@ -23,17 +23,14 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      # যদি gradlew ফাইল না থাকে, তবে এটি অটো জেনারেট করবে
-      - name: Generate Gradle Wrapper
-        run: |
-          if [ ! -f "./gradlew" ]; then
-            echo "Gradlew not found, generating..."
-            gradle wrapper
-          fi
-          chmod +x gradlew
+      # এখানে নির্দিষ্ট করে ৮.৩ ভার্সন সেট করা হয়েছে যা আপনার কোডের সাথে ম্যাচ করে
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.3
 
       - name: Build Release APK
-        run: ./gradlew assembleRelease
+        run: gradle assembleRelease
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
