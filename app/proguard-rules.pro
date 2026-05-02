@@ -1,3 +1,0 @@
--keep class com.livetv.app.data.model.** { *; }
--keepattributes Signature
--keepattributes *Annotation*
